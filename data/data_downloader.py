@@ -64,6 +64,16 @@ class DataDownloader:
         url = "https://giangnguyen.id.vn/gbc-data/aasd4010/DelayFlights-raw.zip"
         self.download_zip(url)
 
+    def download_cleaned_handpick(self):
+        """Download and extract the raw dataset for all years."""
+        url = "https://giangnguyen.id.vn/gbc-data/aasd4010/DelayFlights-cleaned-handpick.zip"
+        self.download_zip(url)
+        
+    def download_cleaned_final(self):
+        """Download and extract the raw dataset for all years."""
+        url = "https://giangnguyen.id.vn/gbc-data/aasd4010/DelayFlights-cleaned-final.zip"
+        self.download_zip(url)
+
 if __name__ == "__main__":
     downloader = DataDownloader()
-    downloader.download_sample_2023()
+    downloader.download_cleaned_handpick()
