@@ -1,6 +1,6 @@
 # Airlines Delay Prediction
 __Course: Deep Learning 1 - George Brown Polytechnic__
-_(Class of Fall 2025)_
+_T431 - Applied AI Solutions Development - Class of Fall 2025_
 
 ___
 
@@ -35,10 +35,20 @@ Prediction output, delay reasons:
 
 ## Tasks
 
-[x] Data acquisition
-[ ] Data pre-processing
-[ ] Features selection
-[ ] ANN algorithms research
-[ ] Models training
-[ ] Accuracy report
-[ ] Interference tests
+- [x] Data acquisition
+- [ ] Data pre-processing
+- [ ] Features selection
+- [ ] ANN algorithms research
+- [ ] Models training
+- [ ] Accuracy report
+- [ ] Interference tests
+
+## Meet the team
+- Giang
+- Sayeed
+- Helly
+- Luis
+- Maya
+- Laura
+
+**Instructor: Prof. Moe Fadaee - Assistance: Robert Kaczur**
