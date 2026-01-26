@@ -1,5 +1,5 @@
 # Airlines Delay Prediction
-__Course: Deep Learning 1 - George Brown Polytechnic__
+__Course: Deep Learning 1 - George Brown Polytechnic__\
 _T431 - Applied AI Solutions Development - Class of Fall 2025_
 
 ___
