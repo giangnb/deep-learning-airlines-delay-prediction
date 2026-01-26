@@ -7,6 +7,16 @@ from pathlib import Path
 class DataDownloader:
     """A class to handle downloading and extracting ZIP files."""
 
+    def __init__(self, download_dir="data"):
+        """Initialize downloader with a specified download directory.
+        
+        Args:
+            download_dir (str): Directory to save downloads. Defaults to 'data'.
+        """
+        self.download_dir = download_dir
+        # Create directory if it doesn't exist
+        os.makedirs(self.download_dir, exist_ok=True)
+
     def download_zip(self, url):
         """
         Download a ZIP file from URL, extract it, and clean up.
@@ -16,7 +26,7 @@ class DataDownloader:
         """
         # Extract filename from URL
         filename = url.split('/')[-1]
-        filepath = os.path.join(os.getcwd(), filename)
+        filepath = os.path.join(self.download_dir, filename)
 
         # Download the ZIP file
         print(f"Downloading {filename} from {url}...")
@@ -26,7 +36,7 @@ class DataDownloader:
         # Extract the ZIP file
         print(f"Extracting {filename}...")
         with zipfile.ZipFile(filepath, 'r') as zip_ref:
-            zip_ref.extractall(os.getcwd())
+            zip_ref.extractall(self.download_dir)
         print(f"Extracted successfully")
 
         # Check if extraction was successful and clean up
@@ -34,7 +44,7 @@ class DataDownloader:
         if extracted_files:
             print(f"Verifying extracted files...")
             # Check if at least one file was extracted
-            first_extracted = os.path.join(os.getcwd(), extracted_files[0].split('/')[0])
+            first_extracted = os.path.join(self.download_dir, extracted_files[0].split('/')[0])
             if os.path.exists(first_extracted):
                 print(f"Extraction verified. Deleting ZIP file...")
                 os.remove(filepath)
