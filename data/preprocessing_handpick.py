@@ -1,4 +1,5 @@
 import pandas as pd
+from sklearn.preprocessing import LabelEncoder
 
 
 class DataPreprocessor:
@@ -39,6 +40,27 @@ class DataPreprocessor:
         # Add Day of Month and Month columns
         df['Day of Month'] = df['Flight Date'].dt.day
         df['Month'] = df['Flight Date'].dt.month
+        
+        # Encode airport codes with shared LabelEncoder
+        airport_encoder = LabelEncoder()
+        all_airports = pd.concat([df['Origin Airport Code'], df['Destination Airport Code']]).unique()
+        airport_encoder.fit(all_airports)
+
+        # Save airport encoder mapping to CSV
+        airport_mapping = pd.DataFrame({
+            'Airport ID': airport_encoder.classes_,
+            'Encoded value': range(len(airport_encoder.classes_))
+        })
+        airport_mapping.to_csv('data/DelayFlights-Airports-mapping.csv', index=False)
+        
+        # Apply encoding to both columns
+        df['Origin Airport Code'] = airport_encoder.transform(df['Origin Airport Code'])
+        df['Destination Airport Code'] = airport_encoder.transform(df['Destination Airport Code'])
+
+        # Convert all columns except Flight Date to numerical dtype
+        for col in df.columns:
+            if col != 'Flight Date':
+                df[col] = pd.to_numeric(df[col], errors='coerce')
         
         # Save processed data to CSV file
         df.to_csv(self.output_file, index=False)
