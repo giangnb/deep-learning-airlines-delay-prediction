@@ -18,4 +18,7 @@ scikit-learn
 #    - Origin:  3-letter airport code (e.g., JFK, LAX, ORD)
 #    - Dest:    3-letter airport code (e.g., LHR, MIA, SFO)
 #    - Month:   1-12 (e.g., 6 for June)
-#
+# Files needed 
+#data/Flights_report_ids.json"
+#"data/Flights_history.json"
+#"data/Flights_routes.json"

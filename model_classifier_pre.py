@@ -8,7 +8,7 @@ from tensorflow.keras.models import load_model
 # --- CONFIG ---
 MODEL_PATH = "data/model_classifier.keras"
 ID_MAP_PATH = "data/Flights_report_ids.json"
-HISTORY_DATA_PATH = "data/Flights_report_clean.csv"
+HISTORY_DATA_PATH = "data/Flights_history.json"
 ROUTE_MAP_PATH = "data/Flights_routes.json"  # <--- NEW FILE
 
 CAUSE_LABELS = [
@@ -46,16 +46,11 @@ class DelayCausePredictor:
 
         # 4. Load History
         try:
-            df_hist = pd.read_csv(HISTORY_DATA_PATH)
-            for _, row in df_hist.iterrows():
-                key = f"{row['Origin']}_{int(row['Month'])}"
-                self.history_lookup[key] = [
-                    row["Carrier Delay"], row["Weather Delay"], 
-                    row["NAS Delay"], row["Security Delay"], 
-                    row["Late Aircraft Delay"]
-                ]
-            print(f"   ✅ History Base Loaded.")
-        except: print("❌ History file missing.")
+            with open(HISTORY_DATA_PATH, 'r') as f:
+                self.history_lookup = json.load(f)
+            print(f"   ✅ History Knowledge Base Loaded.")
+        except Exception as e:
+            print(f"❌ History JSON missing. Run utils_history_mapper.py! ({e})")
 
     def predict_cause(self, airline, origin, dest, month):
         # --- 1. GET IDS ---
@@ -85,9 +80,10 @@ class DelayCausePredictor:
 
         scaled_dur = dur / 400.0
         scaled_dist = dist / 3000.0
-
+        
+        # UPDATED LOOKUP LOGIC
         hist_key = f"{origin}_{month}"
-        hist_vec = self.history_lookup.get(hist_key, [0.0]*5)
+        hist_vec = self.history_lookup.get(hist_key, [0.0, 0.0, 0.0, 0.0, 0.0])
         
         num_vec = np.zeros((1, SEQ_LEN, 7))
         num_vec[0, :, 0] = scaled_dur
