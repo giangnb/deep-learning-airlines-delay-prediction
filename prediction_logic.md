@@ -13,9 +13,9 @@ This script is designed to use the "Classifier model", allowing users to see the
     * **Why:** Prevents "wrong inputs" (e.g., a user testing a 50-mile flight for JFK-LHR), ensuring the model is debugged on realistic data.
 
 * **Use of historical data:**
-    * **Lookup:** Queries `Flights_report_clean.csv`.
-    * **Action:** Retrieves the 5 historical delay averages (Carrier, Weather, NAS, Security, Late Aircraft) for the specific `Origin_Month` key.
-    * **Usage:** These are fed into the model as features *and* displayed in the output for side-by-side comparison.
+    * **Lookup:** Queries `Flights_history.json`.
+    * **Action:** Instantly retrieves the pre-calculated risk vector (5 historical averages) for the specific Origin_Month key (e.g., JFK_6).
+    * **Usage:** They are fed into the model's "History Branch" (Road B) as context and are displayed in the final output to allow the user to compare the "Future Prediction" against the "Historical Average."
 
 ### **2. Preprocessing & Scaling**
 The inputs are processed to match the training environment of `model_classifier.keras`:
