@@ -1,0 +1,14 @@
+# Core Deep Learning Framework
+tensorflow>=2.10.0
+
+# Data Manipulation & CSV Processing
+pandas
+
+# Numerical Operations & Matrix Math
+numpy
+
+# Machine Learning Utilities (Class Weights, Splitters)
+scikit-learn
+
+# To demo tool (Classifier Debugger) 
+# python model_classifier_pre.py
