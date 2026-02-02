@@ -12,3 +12,10 @@ scikit-learn
 
 # To demo tool (Classifier Debugger) 
 # python model_classifier_pre.py
+# 
+#    > Inputs Required:
+#    - Airline: 2-letter code (e.g., AA, UA, DL, WN)
+#    - Origin:  3-letter airport code (e.g., JFK, LAX, ORD)
+#    - Dest:    3-letter airport code (e.g., LHR, MIA, SFO)
+#    - Month:   1-12 (e.g., 6 for June)
+#
