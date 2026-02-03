@@ -36,12 +36,12 @@ Prediction output, delay reasons:
 ## Tasks
 
 - [x] Data acquisition
-- [ ] Data pre-processing
-- [ ] Features selection
-- [ ] ANN algorithms research
-- [ ] Models training
-- [ ] Accuracy report
-- [ ] Interference tests
+- [x] Data pre-processing
+- [x] Features selection
+- [x] ANN algorithms research
+- [x] Models training
+- [x] Accuracy report
+- [x] Interference tests
 
 ## Meet the team
 - Giang
