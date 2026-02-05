@@ -67,6 +67,14 @@ def get_routes_handler():
     __cached__obj["routes_info"] = RoutesInformation(data_path='model/cnn_model_data')
     return __cached__obj["routes_info"]
 
+def get_distance_group(distance):
+    dist = [250, 500, 750, 1000, 1250, 1500, 1750, 2000, 2250, 2500]
+    for i in range(len(dist)):
+        if distance < dist[i]:
+            return i + 1, f"{'Less than' if i<=0 else (str(dist[i-1]) + ' to')} {dist[i]} miles"
+        elif i == len(dist) - 1:
+            return i + 2, f"Equal or greater than {dist[i]} miles"
+
 # --- CALLBACKS ---
 def update_route_info():
     """
@@ -91,6 +99,8 @@ def update_route_info():
         if dist > 0 and dur > 0:
             st.session_state.distance_miles = dist
             st.session_state.fly_time = dur
+            _, distance_name = get_distance_group(dist)
+            st.session_state.distance_group_txt = distance_name
 
 # --- INITIALIZATION ---
 st.title("🛫 Flight Delay Detection")
@@ -118,7 +128,7 @@ def dummy():
 
 # --- UI FORM ---
 with st.container(border=True):
-    st.header("Flight Details")
+    st.markdown("## Flight Details")
     col1, col2 = st.columns(2)
 
     with col1:
@@ -166,20 +176,29 @@ with st.container(border=True):
             max_value=12000,
             key="distance_miles"
         )
+        distance_group_txt = st.text_input(
+            "Distance group",
+            value="2250 to  2500 miles" if 'distance_group_txt' not in st.session_state else st.session_state.distance_group_txt,
+            disabled=True,
+            key="distance_group_txt"
+        )
 
     st.divider()
 
-    # --- FORM SUBMISSION LOGIC ---
-    if st.button("**Calculate Delay**", type="primary", width="stretch", disabled=st.session_state.btn_disabled):
+    btn_calculate = st.button("**Calculate Delay**", type="primary", width="stretch", disabled=st.session_state.btn_disabled)
+    st.markdown("\n")
+
+# --- FORM SUBMISSION LOGIC ---
+if btn_calculate:
+    with st.container(border=True):
         if origin_airport_name == dest_airport_name:
             st.error("Origin and Destination airports cannot be the same.")
         else:
-            st.markdown("\n\n---\n\n")
-
             # Prepare input data for models
             origin_enc = airport_code.to_encoded(origin_airport_name)
             dest_enc = airport_code.to_encoded(dest_airport_name)
             distance = int(distance_miles)
+            distance_group, distance_name = get_distance_group(distance)
 
             input_data = {
                 "Airline": airline_name,
@@ -190,7 +209,7 @@ with st.container(border=True):
                 "Month": fly_date_val.month,
                 "Fly Time Scheduled": int(fly_time_minutes),
                 "Distance Miles": distance,
-                "Distance Group": 1 if distance <= 250 else 2 if distance <= 750 else 3
+                "Distance Group": distance_group
             }
 
             # Get predictions from all loaded models
@@ -201,13 +220,14 @@ with st.container(border=True):
                 if "all_result" not in st.session_state:
                     st.session_state.all_result = all_result
 
-            st.header("Prediction Results")
+            # Display result
+            st.markdown(f"## Delay Prediction {st.session_state.origin_airport} → {st.session_state.dest_airport}")
 
             # Display results in accordion elements
             for model_name, result in all_result.items():
                 with st.expander(f"Results from **{model_name}**", expanded=True):
                     if result is None:
-                        st.warning("Prediction failed or is not available for this model.")
+                        st.warning(f"Prediction failed or is not available for model {model_name}.")
                         continue
                     
                     res_col1, res_col2 = st.columns([1,3])
@@ -224,7 +244,7 @@ with st.container(border=True):
                         if 'predicted_delays_minutes' in result and result['predicted_delays_minutes']:
                             st.write("Predicted Delay Breakdown (minutes):")
                             content = pd.DataFrame([{"Reason": k, "Delay": round(np.expm1(v), 2)} for k, v in result['predicted_delays_minutes'].items() if v is not None and v > 0])
-                            st.dataframe(content.sort_values(by='Delay', ascending=False), hide_index=True, use_container_width=True)
+                            st.dataframe(content.sort_values(by='Delay', ascending=False), hide_index=True, width='stretch')
             
         st.session_state.btn_disabled = False
 

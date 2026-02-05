@@ -33,6 +33,30 @@ Prediction output, delay reasons:
 - Data colelcted from the Department of transportation, USA
 - Scope: All domestic US flights between 2023 and 2025
 
+## How to use
+Prerequisite: Python 3.11
+
+Initialize environment with UV:
+```
+uv init
+uv activate
+```
+
+Run the demo command-line:
+```
+python main.py
+```
+
+Run Streamlit Web UI:
+```
+streamlit run app.py
+```
+
+Download dataset (only needed for training model):
+```
+python data/data_downloader.py
+```
+
 ## Tasks
 
 - [x] Data acquisition

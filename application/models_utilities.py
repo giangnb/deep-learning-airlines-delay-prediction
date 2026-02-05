@@ -3,6 +3,8 @@ from application.flight_delay_predictor import FlightDelayPredictor
 from application.cnn_model_classifier_pre import DelayCausePredictor
 
 class ModelUtilities:
+    """Initialize and inference of all models"""
+
     __cached__models = {}
 
     def __init__(self):
@@ -11,6 +13,11 @@ class ModelUtilities:
     def load_keras(self, name: str, path: str, **kwargs) -> FlightDelayPredictor:
         """
         Load and cache a Keras model.
+
+        Args:
+            name (str): Name of the model.
+            path (str): Path to the model file.
+            **kwargs: Additional keyword arguments.
         """
         if name not in self.__cached__models:
             model = FlightDelayPredictor(model_path=path, 
@@ -22,6 +29,11 @@ class ModelUtilities:
     def load_cnn_model(self, name: str, path: str, **kwargs) -> DelayCausePredictor:
         """
         Load and cache a CNN Keras model.
+
+        Args:
+            name (str): Name of the model.
+            path (str): Path to the model file.
+            **kwargs: Additional keyword arguments.
         """
         if name not in self.__cached__models:
             model = DelayCausePredictor(
@@ -36,6 +48,10 @@ class ModelUtilities:
     def get_prediction(self, model_name: str, **kwargs: dict):
         """
         Get prediction from a cached model.
+        
+        Args:
+            model_name (str): Name of the model.
+            **kwargs: Input data for the model.
         """
         if model_name not in self.__cached__models:
             raise ValueError(f"Model '{model_name}' is not loaded.")
@@ -51,6 +67,9 @@ class ModelUtilities:
     def get_all_models_predictions(self, input_data: dict):
         """
         Get predictions from all cached models.
+        
+        Args:
+            input_data (dict): Input data for the models.
         """
         results = {}
         for name, model in self.__cached__models.items():
