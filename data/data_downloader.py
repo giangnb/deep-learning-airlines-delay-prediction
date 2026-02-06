@@ -25,9 +25,35 @@ class DataDownloader:
             url (str): The URL of the ZIP file to download.
         """
         # Extract filename from URL
+       # 1. Prepare file paths
         filename = url.split('/')[-1]
         filepath = os.path.join(self.download_dir, filename)
 
+        # 2. ADD THIS: Create an opener with a User-Agent header
+        # This tells the server you are a browser, not a script
+        opener = urllib.request.build_opener()
+        opener.addheaders = [('User-Agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)')]
+        urllib.request.install_opener(opener)
+
+        # 3. Download the ZIP file
+        print(f"Downloading {filename} from {url}...")
+        try:
+            urllib.request.urlretrieve(url, filepath)
+            print(f"Downloaded to {filepath}")
+
+            # 4. Extract the ZIP file
+            print(f"Extracting {filename}...")
+            with zipfile.ZipFile(filepath, 'r') as zip_ref:
+                zip_ref.extractall(self.download_dir)
+            print(f"Extracted successfully")
+
+            # 5. Clean up the ZIP
+            os.remove(filepath)
+            print(f"ZIP file deleted: {filepath}")
+            
+        except Exception as e:
+            print(f"Error during download/extraction: {e}")
+            
         # Download the ZIP file
         print(f"Downloading {filename} from {url}...")
         urllib.request.urlretrieve(url, filepath)
