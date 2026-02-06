@@ -2,6 +2,7 @@ import os
 import zipfile
 import urllib.request
 from pathlib import Path
+import argparse
 
 
 class DataDownloader:
@@ -14,8 +15,19 @@ class DataDownloader:
             download_dir (str): Directory to save downloads. Defaults to 'data'.
         """
         self.download_dir = download_dir
-        # Create directory if it doesn't exist
         os.makedirs(self.download_dir, exist_ok=True)
+        self.headers = {
+            "User-Agent": (
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                "AppleWebKit/537.36 (KHTML, like Gecko) "
+                "Chrome/122.0.0.0 Safari/537.36"
+            ),
+            "Accept-Language": "en-US,en;q=0.9",
+            "Accept-Encoding": "gzip, deflate, br",
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+            "Connection": "keep-alive"
+        }
+
 
     def download_zip(self, url):
         """
@@ -30,7 +42,9 @@ class DataDownloader:
 
         # Download the ZIP file
         print(f"Downloading {filename} from {url}...")
-        urllib.request.urlretrieve(url, filepath)
+        req = urllib.request.Request(url, headers=self.headers)
+        with urllib.request.urlopen(req) as response, open(filepath, 'wb') as out_file:
+            out_file.write(response.read())
         print(f"Downloaded to {filepath}")
 
         # Extract the ZIP file
@@ -76,4 +90,15 @@ class DataDownloader:
 
 if __name__ == "__main__":
     downloader = DataDownloader()
-    downloader.download_cleaned_handpick()
+    arg = argparse.ArgumentParser(description="Download the dataset")
+    arg.add_argument('--type', type=str, default='default', help='Choose a data package to download. If not sepcified, download the final stable dataset.')
+    arg = arg.parse_args()
+    type = arg.type.lower()
+    if type == 'raw':
+        downloader.download_raw()
+    elif type == 'handpick':
+        downloader.download_cleaned_handpick()
+    elif type == 'raw2023':
+        downloader.download_sample_2023()
+    else:
+        downloader.download_cleaned_final()
