@@ -20,9 +20,11 @@ class ModelUtilities:
             **kwargs: Additional keyword arguments.
         """
         if name not in self.__cached__models:
+            model_kwargs = {k: v for k, v in kwargs.items() if k != "artifacts_path" and k != "model_type"}
             model = FlightDelayPredictor(model_path=path, 
-                                         artifacts_path=kwargs.get("artifacts_path", "/model/training_artifacts.pkl"), 
-                                         model_type=kwargs.get("model_type", "ANN"))
+                                         artifacts_path=kwargs.get("artifacts_path", "model/training_artifacts.pkl"), 
+                                         model_type=kwargs.get("model_type", "ANN"),
+                                         **model_kwargs)
             self.__cached__models[name] = model
         return self.__cached__models[name]
     
@@ -38,9 +40,9 @@ class ModelUtilities:
         if name not in self.__cached__models:
             model = DelayCausePredictor(
                 model_path=path,
-                id_map_path=kwargs.get("id_map_path", "/model/cnn_model_data/Flights_report_ids.json"),
-                history_data_path=kwargs.get("history_data_path", "/model/cnn_model_data/Flights_history.json"),
-                route_map_path=kwargs.get("route_map_path", "/model/cnn_model_data/Flights_routes.json")
+                id_map_path=kwargs.get("id_map_path", "model/cnn_model_data/Flights_report_ids.json"),
+                history_data_path=kwargs.get("history_data_path", "model/cnn_model_data/Flights_history.json"),
+                route_map_path=kwargs.get("route_map_path", "model/cnn_model_data/Flights_routes.json")
             )
             self.__cached__models[name] = model
         return self.__cached__models[name]

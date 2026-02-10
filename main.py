@@ -8,16 +8,16 @@ def initialize_models(artifacts_path="/model/training_artifacts.pkl"):
     model_utils = ModelUtilities()
     try:
         model_utils.load_keras(
-        name="Multi-Model",
-        path="model/MultiModels-20260201-041816.keras",
-        artifacts_path=artifacts_path
-    )
+            name="Multi-Model",
+            path="model/MultiModels-20260201-041816.keras",
+            artifacts_path=artifacts_path
+        )
     except Exception as e:
         print(f"Failed loading model Multi-Model: {e}")
     try:
         model_utils.load_keras(
             name="TabTransformer",
-            path="model/Transformer-20260202-084654-NEW DAT-5epochs-huber-scaled targets.h5",   
+            path="model/Transformer-20260202-084654-NEW DAT-5epochs-huber-scaled targets.h5",
             artifacts_path=artifacts_path,
             model_type="TabTransformer"
         )
@@ -33,6 +33,16 @@ def initialize_models(artifacts_path="/model/training_artifacts.pkl"):
         )
     except Exception as e:
         print(f"Failed loading model Convolutional NN: {e}")
+    try:
+        model_utils.load_keras(
+            name="Bi-LSTM",
+            path="model/bilstm-final_multitask_model.keras",
+            model_type="Bi-LSTM",
+            artifacts_path=artifacts_path,
+            lstm_scaler_path = "model/bi_lstm_data/scaler.pkl"
+        )
+    except Exception as e:
+        print(f"Failed loading model Bi-LSTM: {e}")
     
     print(f"Initialized models: {model_utils.get_model_names()}")
     return model_utils
@@ -42,6 +52,7 @@ def main():
     #airlines_code = RoutesInformation('model/cnn_model_data/Flights_report_ids.json')
     adaptor = initialize_models("model/training_artifacts.pkl")
 
+    """
     origin = input("Origin Airport Code: ")
     dest = input("Destination Airport Code: ")
 
@@ -63,6 +74,19 @@ def main():
         "Fly Time Scheduled": int(input("Fly time (minutes): ")),
         "Distance Miles": distance,
         "Distance Group": 1 if distance <= 250 else 2 if distance <= 750 else 3
+    })
+    """
+
+    all_result = adaptor.get_all_models_predictions({
+        "Airline": 1,
+        "Origin Airport Code": 182,
+        "Destination Airport Code": 193,
+        "Departure Block Hour": 17,
+        "Day Of Week": 3,
+        "Month": 7,
+        "Fly Time Scheduled": 300,
+        "Distance Miles": 1800,
+        "Distance Group": 3
     })
 
     for model_name, result in all_result.items():

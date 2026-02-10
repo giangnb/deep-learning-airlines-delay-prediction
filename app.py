@@ -49,6 +49,16 @@ def initialize_models(artifacts_path="model/training_artifacts.pkl"):
         )
     except Exception as e:
         st.error(f"Failed loading model Convolutional NN: {e}")
+    try:
+        model_utils.load_keras(
+            name="Bi-LSTM",
+            path="model/bilstm-final_multitask_model.keras",
+            model_type="Bi-LSTM",
+            artifacts_path=artifacts_path,
+            lstm_scaler_path = "model/bi_lstm_data/scaler.pkl"
+        )
+    except Exception as e:
+        st.error(f"Failed loading model Bi-LSTM: {e}")
     
     __cached__obj["model_utils"] = model_utils
     return model_utils
@@ -103,7 +113,7 @@ def update_route_info():
             st.session_state.distance_group_txt = distance_name
 
 # --- INITIALIZATION ---
-st.title("🛫 Flight Delay Detection")
+st.title("🛫 Flight Delay Prediction Tool")
 st.markdown("\n")
 
 # Load all necessary resources
@@ -165,7 +175,7 @@ with st.container(border=True):
             on_change=update_route_info
         )
         departure_hour = st.number_input(
-            "Departure hour",
+            "Departure hour (0-23)",
             min_value=0,
             max_value=23,
             value=17

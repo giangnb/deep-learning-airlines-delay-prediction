@@ -3,9 +3,10 @@ import numpy as np
 import pandas as pd
 import pickle
 from datetime import datetime
+import joblib
 
 class FlightDelayPredictor:
-    def __init__(self, model_path, artifacts_path, model_type="ANN"):
+    def __init__(self, model_path, artifacts_path, model_type="ANN", **kwargs):
         # 1. Load Model
         self.model = tf.keras.models.load_model(model_path)
         
@@ -26,6 +27,9 @@ class FlightDelayPredictor:
             'hr_sin', 'hr_cos', 'dow_sin', 'dow_cos', 'month_sin', 'month_cos',
             'origin_avg_delay', 'dest_avg_delay'
         ]
+
+        if self.model_type == "Bi-LSTM":
+            self.lstm_scaler = joblib.load(kwargs.get("lstm_scaler_path", "model/lstm_scaler.pkl"))
 
     def preprocess_single_input(self, user_input):
         # --- A. Target Encoding ---
@@ -75,6 +79,29 @@ class FlightDelayPredictor:
                 "numerical": self.scaler.fit_transform(num_vector).reshape(1, -1)
             }
             return tab_input
+        elif self.model_type == "Bi-LSTM":
+            window_size = 10
+            user_input['Day of Month'] = user_input['Day Of Week']
+            num_cols = [
+                'Departure Block Hour', 'Day Of Week', 'Fly Time Scheduled', 
+                'Distance Miles', 'Distance Group', 'Day of Month', 'Month'
+            ]
+            cat_cols = ['Origin Airport Code', 'Destination Airport Code']
+            lstm_input = {}
+            for col in cat_cols:
+                lstm_input[col] = user_input[col]
+            for col in num_cols:
+                lstm_input[col] = user_input[col]
+            lstm_input = pd.DataFrame([lstm_input])
+            lstm_input[num_cols] = self.lstm_scaler.transform(lstm_input[num_cols])
+            single_cat_seq = np.tile(lstm_input[cat_cols].values, (window_size, 1))
+            # Shape: (1, 10, 2)
+            final_cat_input = np.expand_dims(single_cat_seq, axis=0)
+            # Shape: (10, 7)
+            single_num_seq = np.tile(lstm_input[num_cols].values, (window_size, 1))
+            # Shape: (1, 10, 7)
+            final_num_input = np.expand_dims(single_num_seq, axis=0)
+            return [final_cat_input, final_num_input]
         else:
             scaled_num_vector = self.scaler.transform(num_vector)
             cat_vector = np.array([[origin, dest]])
@@ -93,6 +120,10 @@ class FlightDelayPredictor:
         prob_delay, reason_probs, reg_log_vals = None, None, None
         if self.model_type == "TabTransformer":
             reg_log_vals = predictions[0]
+        elif self.model_type == "Bi-LSTM":
+            prob_delay = predictions[0][0][0] # Binary probability
+            reason_probs = predictions[1][0]  # Class probabilities
+            reg_log_vals = predictions[2][0]  # Regression (Log scale)
         else:
             prob_delay = predictions[0][0][0] # Binary probability
             reason_probs = predictions[1][0]  # Class probabilities
