@@ -9,15 +9,16 @@ from sklearn.preprocessing import StandardScaler
 import joblib
 
 # --- 1. Load Data ---
-file_path = 'data/DelayFlights-cleaned-scaled.csv' # Adjust to your actual path
+file_path = 'data/DelayFlights-cleaned-scaled.csv'
 df = pd.read_csv(file_path)
 
 # Sort chronologically to maintain time-series integrity
+
 df['Flight Date'] = pd.to_datetime(df['Flight Date'])
 df = df.sort_values(by=['Flight Date', 'Departure Block Hour'])
 
 # --- 2. Feature & Target Selection ---
-# Based on your sample data:
+
 cat_cols = ['Origin Airport Code', 'Destination Airport Code']
 num_cols = [
     'Departure Block Hour', 'Day Of Week', 'Fly Time Scheduled', 
