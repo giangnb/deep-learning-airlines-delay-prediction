@@ -21,3 +21,10 @@ class AirportCode:
         if not row.empty:
             return row['Encoded value'].values[0]
         return None
+    
+    def list_airports(self):
+        """
+        List all airport names.
+        """
+        return self.data['Airport ID'].tolist()
+
